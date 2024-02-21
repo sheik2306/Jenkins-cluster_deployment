@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dind-service2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dind-service2
+  template:
+    metadata:
+      labels:
+        app: dind-service2
+    spec:
+      containers:
+        - name: dind
+          image: "docker:dind"
+          imagePullPolicy: Always
+          command: ["dockerd", "--host", "tcp://127.0.0.1:2375"]
+          securityContext:
+            privileged: true
+

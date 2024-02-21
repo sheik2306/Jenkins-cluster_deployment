@@ -13,20 +13,25 @@ spec:
         app: jenkins
     spec:
       containers:
-      - name: jenkins
-        image: jenkins/jenkins:lts
-        ports:
-        - containerPort: 8080
-        - containerPort: 50000
-        volumeMounts:
-        - name: jenkins-data
-          mountPath: /var/jenkins_home
-        - name: docker-socket
-          mountPath: /var/run/docker.sock  # Mount Docker socket
+        - name: jenkins
+          image: jenkins/jenkins:lts
+          ports:
+            - containerPort: 8080
+            - containerPort: 50000
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+            - name: docker-binary
+              mountPath: /usr/bin/docker
+              subPath: docker  # The binary name on the host
+          securityContext:
+            privileged: true   # Necessary for accessing Docker daemon
       volumes:
-      - name: jenkins-data
-        persistentVolumeClaim:
-          claimName: jenkins-pvc
-      - name: docker-socket
-        hostPath:
-          path: /var/run/docker.sock  # Path to Docker Unix socket within WSL 2
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
+        - name: docker-binary
+          hostPath:
+            path: /usr/bin/docker   # Path to Docker binary on the host machine
+            type: File
+
